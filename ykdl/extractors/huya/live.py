@@ -10,6 +10,7 @@ import json
 import random
 import time
 
+
 class HuyaLive(VideoExtractor):
     name = u"Huya Live (虎牙直播)"
 
