@@ -18,7 +18,7 @@ class HuyaLive(VideoExtractor):
         html  = get_content(self.url)
 
         json_script = match1(html, '"stream": ({.+?})\s*};')
-        assert json_script, "live video is offline"
+        assert json_script, ""
         data = json.loads(json_script)
         assert data['status'] == 200, data['msg']
 
