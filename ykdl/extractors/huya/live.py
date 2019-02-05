@@ -8,6 +8,7 @@ from ykdl.util.match import match1, matchall
 
 import json
 import random
+import time
 
 class HuyaLive(VideoExtractor):
     name = u"Huya Live (虎牙直播)"
@@ -23,7 +24,12 @@ class HuyaLive(VideoExtractor):
         assert data['status'] == 200, data['msg']
 
         room_info = data['data'][0]['gameLiveInfo']
-        info.title = room_info['roomName']
+        intro=room_info['introduction']
+        rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
+        info.title = re.sub(rstr,"_",intro)
+        nick = room_info['nick']
+        nick = re.sub(rstr,"_",nick)
+        self.name = time.strftime('%y%m%d_%H%M%S')+"-"+nick+"-"+info.title
 
         stream_info = random.choice(data['data'][0]['gameStreamInfoList'])
         sFlvUrl = stream_info['sFlvUrl']
