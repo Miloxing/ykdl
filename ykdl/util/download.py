@@ -85,7 +85,7 @@ def upload(name):
     nick = name.split("-")[1]
     os.system("rclone move '{}' milo:milo/b/huya/'{}'".format(name,nick))
     if (not os.path.exists(name)):
-        print("%s 上传成功" % )
+        print("%s 上传成功" % name)
 
 def save_urls(urls, name, ext, jobs=1):
     ext = encode_for_wrap(ext)
