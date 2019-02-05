@@ -8,7 +8,7 @@ from ykdl.util.match import match1, matchall
 
 import json
 import random
-import time
+import time,re
 
 
 class HuyaLive(VideoExtractor):
