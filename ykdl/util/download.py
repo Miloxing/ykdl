@@ -72,6 +72,8 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
             tfp.write(block)
             blocknum += 1
             reporthook(blocknum, bs, size)
+            if(blocknum >= 1500000):
+                break
     if os.path.exists(name):
         filesize = os.path.getsize(name)
         if filesize == size:
@@ -79,13 +81,17 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 status[0] = 1
             else:
                 status[part] =1
-    upload(name)
+                
+    os.system('mv "{}" /root/b/'.format(name))
+    #upload(name)
     
+'''    
 def upload(name):
     nick = name.split("-")[1]
     os.system("rclone move '{}' milo:milo/b/huya/'{}'".format(name,nick))
     if (not os.path.exists(name)):
         print("%s 上传成功" % name)
+'''
 
 def save_urls(urls, name, ext, jobs=1):
     ext = encode_for_wrap(ext)
