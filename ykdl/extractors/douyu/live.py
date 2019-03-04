@@ -8,7 +8,7 @@ from ykdl.extractor import VideoExtractor
 from ykdl.videoinfo import VideoInfo
 from ykdl.compact import urlencode
 
-import time
+import time,re
 import json
 import uuid
 
