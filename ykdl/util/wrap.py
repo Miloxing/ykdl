@@ -122,3 +122,5 @@ def launch_ffmpeg_download(url, name, live):
     cmd += ['-i', url, '-c', 'copy', '-absf', 'aac_adtstoasc',  '-hide_banner','-fs','1073741824', name]
 
     subprocess.call(cmd)
+    cmd1=['mv', name, '/root/b/']
+    subprocess.call(cmd1)
