@@ -57,8 +57,6 @@ class Douyutv(VideoExtractor):
         rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
         info.title = re.sub(rstr,"_",title)
         info.artist = re.sub(rstr,"_",artist)
-        if info.title and info.artist:
-            info.title = time.strftime('%y%m%d_%H%M%S')+"-"+info.artist+"-"+info.title
 
         html_content = get_content('https://www.douyu.com/swf_api/homeH5Enc?rids=' + self.vid)
         data = json.loads(html_content)
