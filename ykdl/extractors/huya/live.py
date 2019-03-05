@@ -29,8 +29,7 @@ class HuyaLive(VideoExtractor):
         rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
         info.title = re.sub(rstr,"_",intro)
         nick = room_info['nick']
-        nick = re.sub(rstr,"_",nick)
-        info.title = time.strftime('%y%m%d_%H%M%S')+"-"+nick+"-"+info.title
+        info.artist = re.sub(rstr,"_",nick)
 
         stream_info = random.choice(data['data'][0]['gameStreamInfoList'])
         sFlvUrl = stream_info['sFlvUrl']
