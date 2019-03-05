@@ -119,6 +119,6 @@ def launch_ffmpeg_download(url, name, live):
     if os.path.isfile(url):
        cmd += ['-protocol_whitelist', 'file,tcp,http,https,tls' ]
 
-    cmd += ['-i', url, '-c', 'copy', '-absf', 'aac_adtstoasc',  '-hide_banner', name]
+    cmd += ['-i', url, '-c', 'copy', '-absf', 'aac_adtstoasc',  '-hide_banner','-fs','1073741824', name]
 
     subprocess.call(cmd)
