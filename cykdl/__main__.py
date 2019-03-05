@@ -108,7 +108,8 @@ def handle_videoinfo(info, index=0):
         else:
             name = args.output_name
     else:
-        name = info.build_file_name(stream_id)
+        name = time.strftime('%y%m%d_%H%M%S')+"-"+info.artist+"-"+info.title
+        #name = info.build_file_name(stream_id)
 
     ext = info.streams[stream_id]['container']
     live = info.live
