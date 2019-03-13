@@ -14,6 +14,7 @@ from ykdl.compact import compact_tempfile
 
 sys.path.append('/root/u')
 from getip import *
+import random
 
 posix = os.name == 'posix'
 
@@ -116,7 +117,7 @@ def launch_ffmpeg_download(url, name, live):
     if live:
         print('stop downloading by press \'q\'')
 
-    aip=getip()
+    aip=getip(random.randint(0,199))
     proxy='http://'+aip['http']
     cmd = ['ffmpeg', '-http_proxy', proxy, '-listen_timeout', '10000', '-y']
 
