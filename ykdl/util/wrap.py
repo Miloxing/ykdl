@@ -119,14 +119,25 @@ def launch_ffmpeg_download(url, name, live):
 
     aip=getip(random.randint(0,199))
     proxy='http://'+aip['http']
-    cmd = ['ffmpeg', '-http_proxy', proxy, '-listen_timeout', '10000', '-y']
+    cmd = ['ffmpeg', '-http_proxy', proxy, '-listen_timeout', '5000', '-y']
 
     url = encode_for_wrap(url)
     if os.path.isfile(url):
        cmd += ['-protocol_whitelist', 'file,tcp,http,https,tls' ]
 
-    cmd += ['-i', url, '-c', 'copy', '-absf', 'aac_adtstoasc',  '-hide_banner','-fs','1073741824', name]
-
-    subprocess.call(cmd)
-    cmd1=['mv', name, '/root/b/']
-    subprocess.call(cmd1)
+    cmd += ['-i', url, '-c', 'copy', '-absf', 'aac_adtstoasc',  '-hide_banner','-fs','1073741824','-shortest', name]
+    aa = 0
+    while(aa==0):
+        aa=subprocess.call(cmd)
+        cmd1=['mv', name, '/root/b/']
+        subprocess.call(cmd1)
+        names=name.split('-')
+        names[0]=time.strftime('%y%m%d_%H%M%S')
+        name = None
+        for i in names[:-2]:
+            if (name==None):
+                name =i
+            else:
+                name+=i+'-' 
+        name+=names[-1]
+        cmd[-1]=name
