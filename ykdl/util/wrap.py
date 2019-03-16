@@ -134,10 +134,9 @@ def launch_ffmpeg_download(url, name, live):
         names=name.split('-')
         names[0]=time.strftime('%y%m%d_%H%M%S')
         name = None
-        for i in names[:-2]:
+        for i in names:
             if (name==None):
                 name =i
             else:
-                name+=i+'-' 
-        name+=names[-1]
+                name+='-'+ i
         cmd[-1]=name
