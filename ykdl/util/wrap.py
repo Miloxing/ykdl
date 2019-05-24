@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import print_function
-import os
+import os,time
 import sys
 import subprocess
 import shlex
@@ -11,9 +11,6 @@ from logging import getLogger
 logger = getLogger("wrap")
 
 from ykdl.compact import compact_tempfile
-
-sys.path.append('/root/u')
-from getip import *
 import random
 
 posix = os.name == 'posix'
