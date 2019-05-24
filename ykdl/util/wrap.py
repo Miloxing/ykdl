@@ -114,9 +114,7 @@ def launch_ffmpeg_download(url, name, live):
     if live:
         print('stop downloading by press \'q\'')
 
-    aip=getip(random.randint(0,199))
-    proxy='http://'+aip['http']
-    cmd = ['ffmpeg', '-http_proxy', proxy, '-listen_timeout', '5000', '-y']
+    cmd = ['ffmpeg', '-listen_timeout', '5000', '-y']
 
     url = encode_for_wrap(url)
     if os.path.isfile(url):
