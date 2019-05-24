@@ -36,22 +36,21 @@ class Douyutv(VideoExtractor):
         info = VideoInfo(self.name, True)
         add_header("Referer", 'https://www.douyu.com')
 
-        title = None
-        artist = None
-        self.vid = match1(self.url, 'douyu.com/(\d+)')
+        html = get_content(self.url)
+        self.vid = match1(html, '\$ROOM\.room_id\s*\=\s*(\d+)',
+                                'room_id\s*=\s*(\d+)',
+                                '"room_id.?":(\d+)',
+                                'data-onlineid=(\d+)')
+        title = match1(html, 'Title-headlineH2">([^<]+)<')
+        artist = match1(html, 'Title-anchorName" title="([^"]+)"')
         
-        if not self.vid:
-            html = get_content(self.url)
-            self.vid = match1(html, 'room_id\s*=\s*(\d+);', '"room_id.?":(\d+)', 'data-onlineid=(\d+)')
-            title = match1(html, 'Title-headlineH2">([^<]+)<')
-            artist = match1(html, 'Title-anchorName" title="([^"]+)"')
-        
-        if not artist:
-            html_content = get_content('https://open.douyucdn.cn/api/RoomApi/room/' + self.vid)
-            data = json.loads(html_content)
-            if data['error'] == 0:
-                title = data['data']['room_name']
-                artist = data['data']['owner_name']
+        if not title or not artist:
+            html = get_content('https://open.douyucdn.cn/api/RoomApi/room/' + self.vid)
+            room_data = json.loads(html)
+            if room_data['error'] == 0:
+                room_data = room_data['data']
+                title = room_data['room_name']
+                artist = room_data['owner_name']
         
         
         rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
