@@ -72,7 +72,7 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
             tfp.write(block)
             blocknum += 1
             reporthook(blocknum, bs, size)
-            if(blocknum >= 196608):
+            if(blocknum >= 131072):
                 print('文件大小达到限制，结束')
                 status[0] = 1
                 break
