@@ -56,6 +56,7 @@ class Douyutv(VideoExtractor):
         rstr = r"[\/\\\:\*\?\"\<\>\|\- ]"
         info.title = re.sub(rstr,"_",title)
         info.artist = re.sub(rstr,"_",artist)
+        info.live = False
 
         html_content = get_content('https://www.douyu.com/swf_api/homeH5Enc?rids=' + self.vid)
         data = json.loads(html_content)
@@ -76,6 +77,7 @@ class Douyutv(VideoExtractor):
         js_ctx.eval(js_enc)
         did = uuid.uuid4().hex
         tt = str(int(time.time()))
+        print(artist,self.vid)
         ub98484234 = js_ctx.call('ub98484234', self.vid, did, tt)
         self.logger.debug('ub98484234: ' + ub98484234)
         params = {
