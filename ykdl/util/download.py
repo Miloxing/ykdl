@@ -63,10 +63,13 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
             response = urlopen(req, None)
             open_mode = 'ab'
     reporthook(blocknum, bs, size)
-    with open(name, open_mode) as tfp:
-        while True:
+    while True:
+        tfp = open(name, open_mode)
+        try:
             block = response.read(bs)
             if not block:
+                tfp.close()
+                status[0] = 1
                 break
             read += len(block)
             tfp.write(block)
@@ -74,8 +77,13 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
             reporthook(blocknum, bs, size)
             if(blocknum >= 131072):
                 print('文件大小达到限制，结束')
-                status[0] = 1
-                break
+                os.system('mv "{}" /root/b/'.format(name))
+                namepart = name.split('-',1)
+                name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
+                
+        except:
+            tfp.close()
+            break
     if os.path.exists(name):
         filesize = os.path.getsize(name)
         if filesize == size:
