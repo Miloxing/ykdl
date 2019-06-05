@@ -21,7 +21,7 @@ except:
     logger.warning("multithread download disabled!")
     logger.warning("please install concurrent.futures from https://github.com/agronholm/pythonfutures !")
 
-def simple_hook(arg1, arg2, arg3):
+def simple_hook(arg1, arg2, arg3,name):
     if arg3 > 0:
         percent = int(arg1 * arg2 * 100 / arg3)
         if percent > 100:
@@ -29,7 +29,7 @@ def simple_hook(arg1, arg2, arg3):
         sys.stdout.write('\r %3d' % percent + '%')
         sys.stdout.flush()
     else:
-        sys.stdout.write('\r' + str(round(arg1 * arg2 / 1048576, 1)) + 'MB')
+        sys.stdout.write('\r' +name+' -- '+ str(round(arg1 * arg2 / 1048576, 1)) + 'MB')
         sys.stdout.flush()
 
 def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
@@ -45,54 +45,65 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     blocknum = 0
     open_mode = 'wb'
     req = Request(url, headers = fake_headers)
-    response = urlopen(req, None)
-    if "content-length" in response.headers:
-        size = int(response.headers["Content-Length"])
-    if os.path.exists(name):
-        filesize = os.path.getsize(name)
-        if filesize == size:
-            print('Skipped: file already downloaded')
-            if part is None:
-                status[0] = 1
-            else:
-                status[part] =1
-            return
-        elif -1 != size:
-            req.add_header('Range', 'bytes=%d-' % filesize)
-            blocknum = int(filesize / bs)
-            response = urlopen(req, None)
-            open_mode = 'ab'
-    reporthook(blocknum, bs, size)
-    while True:
+    try:
+        response = urlopen(req, None)
+        if "content-length" in response.headers:
+            size = int(response.headers["Content-Length"])
+        if os.path.exists(name):
+            filesize = os.path.getsize(name)
+            if filesize == size:
+                print('Skipped: file already downloaded')
+                if part is None:
+                    status[0] = 1
+                else:
+                    status[part] =1
+                return
+            elif -1 != size:
+                req.add_header('Range', 'bytes=%d-' % filesize)
+                blocknum = int(filesize / bs)
+                response = urlopen(req, None)
+                open_mode = 'ab'
+        reporthook(blocknum, bs, size,name)
         tfp = open(name, open_mode)
-        try:
-            block = response.read(bs)
-            if not block:
+        while True:
+            
+            try:
+                block = response.read(bs)
+                if not block:
+                    tfp.close()
+                    status[0] = 1
+                    break
+                read += len(block)
+                tfp.write(block)
+                blocknum += 1
+                if blocknum % 100 == 0:
+                    reporthook(blocknum, bs, size,name)
+                if(blocknum >= 131072):
+                    tfp.close()
+                    print('文件大小达到限制，结束')
+                    os.system('mv "{}" /root/b/'.format(name))
+                    namepart = name.split('-',1)
+                    name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
+                    tfp = open(name, open_mode)
+                    
+            except:
                 tfp.close()
-                status[0] = 1
                 break
-            read += len(block)
-            tfp.write(block)
-            blocknum += 1
-            reporthook(blocknum, bs, size)
-            if(blocknum >= 131072):
-                print('文件大小达到限制，结束')
-                os.system('mv "{}" /root/b/'.format(name))
-                namepart = name.split('-',1)
-                name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
-                
-        except:
+        if os.path.exists(name):
+            filesize = os.path.getsize(name)
+            if filesize == size:
+                if part is None:
+                    status[0] = 1
+                else:
+                    status[part] =1
+    except:
+        pass
+    finally:
+        if "response" in locals():
+            response.close()
+        if "tfp" in locals():
             tfp.close()
-            break
-    if os.path.exists(name):
-        filesize = os.path.getsize(name)
-        if filesize == size:
-            if part is None:
-                status[0] = 1
-            else:
-                status[part] =1
-                
-    os.system('mv "{}" /root/b/'.format(name))
+        os.system('mv "{}" /root/b/'.format(name))
     #upload(name)
     
 '''    
