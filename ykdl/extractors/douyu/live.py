@@ -122,7 +122,7 @@ def get_random_name(l):
         '''.format(**names_dict)
         js_enc = js_enc.replace('eval({workflow});'.format(**names_dict), js_patch)
 
-         js_ctx = JSEngine()
+        js_ctx = JSEngine()
         js_ctx.eval(js_md5)
         js_ctx.eval(js_dom)
         js_ctx.eval(js_enc)
