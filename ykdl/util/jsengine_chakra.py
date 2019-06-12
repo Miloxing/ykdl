@@ -39,12 +39,15 @@ class ChakraHandle():
     def eval_js(self, script, source=u""):
         """
             Eval javascript string
+
             Examples:
                 .eval_js("(()=>2)()") // (True, '2')
                 .eval_js("(()=>a)()") // (False, "'a' is not defined")
+
             Parameters:
                 script(str): javascript code string
                 source(str?): code path (optional)
+
             Returns:
                 (bool, result)
                 bool: indicates whether javascript is running successfully.
