@@ -63,8 +63,8 @@ class Douyutv(VideoExtractor):
         info.artist = re.sub(rstr,"_",artist)
         info.live = False
 
-        html_content = get_content('https://www.douyu.com/swf_api/homeH5Enc?rids=' + self.vid)
-        data = json.loads(html_content)
+        html_h5enc = get_content('https://www.douyu.com/swf_api/homeH5Enc?rids=' + self.vid)
+        data = json.loads(html_h5enc)
         assert data['error'] == 0, data['msg']
         js_enc = data['data']['room' + self.vid]
 
@@ -128,7 +128,6 @@ class Douyutv(VideoExtractor):
         js_ctx.eval(js_debug)
         did = uuid.uuid4().hex
         tt = str(int(time.time()))
-        print(artist,self.vid)
         ub98484234 = js_ctx.call('ub98484234', self.vid, did, tt)
         self.logger.debug('ub98484234: %s', ub98484234)
         ub98484234 = ub98484234[names_dict['resoult']]
@@ -137,7 +136,7 @@ class Douyutv(VideoExtractor):
             'did': did,
             'tt': tt,
             'sign': match1(ub98484234, 'sign=(\w{32})'),
-            'cdn': 'ws-h5',
+            'cdn': '',
             'iar': 0,
             'ive': 0
         }
@@ -168,7 +167,6 @@ class Douyutv(VideoExtractor):
                 'src' : [real_url],
                 'size': float('inf')
             }
-
 
             error_msges = []
             if rate == 0:
