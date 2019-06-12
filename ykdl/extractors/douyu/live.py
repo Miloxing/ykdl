@@ -17,14 +17,13 @@ import string
 douyu_match_pattern = [ 'class="hroom_id" value="([^"]+)',
                         'data-room_id="([^"]+)'
                       ]
-class Douyutv(VideoExtractor):
-    name = u'斗鱼直播 (DouyuTV)'
 def get_random_name(l):
     return random.choice(string.ascii_letters) + \
            ''.join(random.sample(string.ascii_letters + string.digits, l - 1))
+  
+class Douyutv(VideoExtractor):
+    name = u'斗鱼直播 (DouyuTV)'
 
-
-    
     stream_ids = ['BD10M', 'BD8M', 'BD4M', 'BD', 'TD', 'HD', 'SD']
     profile_2_id = {
         u'蓝光10M': 'BD10M',
