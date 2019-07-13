@@ -36,6 +36,8 @@ class HuyaLive(VideoExtractor):
         sStreamName = stream_info['sStreamName']
         sFlvUrlSuffix = stream_info['sFlvUrlSuffix']
         sFlvAntiCode = stream_info['sFlvAntiCode']
+        Codes = sFlvAntiCode.split("amp;")
+        sFlvAntiCode = "".join(Codes)
         flv_url = '{}/{}.{}?{}'.format(sFlvUrl, sStreamName, sFlvUrlSuffix, sFlvAntiCode)
 
         info.stream_types.append("current")
