@@ -9,8 +9,13 @@ from ykdl.compact import Request, urlopen
 from ykdl.util import log
 from ykdl.util.wrap import encode_for_wrap
 from .html import fake_headers
+import traceback
+import requests
 
 logger = getLogger("downloader")
+
+def get_proxy():
+        return requests.get("http://127.0.0.1:5010/get/").text
 
 try:
     from concurrent.futures import ThreadPoolExecutor
@@ -46,6 +51,7 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     open_mode = 'wb'
     req = Request(url, headers = fake_headers)
     try:
+        '''
         response = urlopen(req, None)
         if "content-length" in response.headers:
             size = int(response.headers["Content-Length"])
@@ -63,8 +69,25 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 blocknum = int(filesize / bs)
                 response = urlopen(req, None)
                 open_mode = 'ab'
+        '''
+        proxy = {'https':get_proxy()}
+        r = requests.get(url,stream=True,proxies=proxy,timeout=10)
         reporthook(blocknum, bs, size,name)
         tfp = open(name, open_mode)
+        for chunk in r.iter_content(chunk_size=bs):
+            if(chunk):
+                tfp.write(chunk)
+                blocknum += 1
+                if blocknum % 100 == 0:
+                    reporthook(blocknum, bs, size,name)
+                if(blocknum >= 131072):
+                    tfp.close()
+                    print('文件大小达到限制，结束')
+                    os.system('mv "{}" /root/b/'.format(name))
+                    namepart = name.split('-',1)
+                    name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
+                    tfp = open(name, open_mode)
+        '''
         while True:
             
             try:
@@ -89,6 +112,7 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
             except:
                 tfp.close()
                 break
+        '''
         if os.path.exists(name):
             filesize = os.path.getsize(name)
             if filesize == size:
@@ -97,13 +121,19 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 else:
                     status[part] =1
     except:
-        pass
+        traceback.print_exc()
     finally:
         if "response" in locals():
             response.close()
         if "tfp" in locals():
             tfp.close()
-        os.system('mv "{}" /root/b/'.format(name))
+        if os.path.exists(name):
+            filesize = os.path.getsize(name)
+            if filesize < 1024*600:
+                print(name,"大小不足1mb，删除")
+                os.remove(name)
+            else:
+                os.system('mv "{}" /root/b/'.format(name))
     #upload(name)
     
 '''    
