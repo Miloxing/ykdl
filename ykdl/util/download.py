@@ -11,6 +11,7 @@ from ykdl.util.wrap import encode_for_wrap
 from .html import fake_headers
 import traceback
 import requests
+import time
 
 logger = getLogger("downloader")
 
