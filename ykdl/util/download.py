@@ -16,7 +16,11 @@ import time
 logger = getLogger("downloader")
 
 def get_proxy():
-        return requests.get("http://127.0.0.1:5010/get/").text
+    while True:
+        try:
+            return requests.get("http://127.0.0.1:5010/get/").json().get("proxy")
+        except:
+            time.sleep(0.5)
 
 try:
     from concurrent.futures import ThreadPoolExecutor
@@ -72,22 +76,29 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 open_mode = 'ab'
         '''
         proxy = {'https':get_proxy()}
-        r = requests.get(url,stream=True,proxies=proxy,timeout=10)
-        reporthook(blocknum, bs, size,name)
-        tfp = open(name, open_mode)
-        for chunk in r.iter_content(chunk_size=bs):
-            if(chunk):
-                tfp.write(chunk)
-                blocknum += 1
-                if blocknum % 100 == 0:
-                    reporthook(blocknum, bs, size,name)
-                if(blocknum >= 131072):
-                    tfp.close()
-                    print('文件大小达到限制，结束')
-                    os.system('mv "{}" /root/b/'.format(name))
-                    namepart = name.split('-',1)
-                    name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
-                    tfp = open(name, open_mode)
+        while True:
+            r = requests.get(url,proxies=proxy,stream=True,timeout=5)
+            reporthook(blocknum, bs, size,name)
+            tfp = open(name, open_mode)
+            for chunk in r.iter_content(chunk_size=bs):
+                if(chunk):
+                    tfp.write(chunk)
+                    blocknum += 1
+                    if blocknum % 100 == 0:
+                        reporthook(blocknum, bs, size,name)
+                    if(blocknum >= 131072):
+                        tfp.close()
+                        r.close()
+                        print('文件大小达到限制，结束')
+                        os.system('mv "{}" /root/b/'.format(name))
+                        namepart = name.split('-',1)
+                        name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
+                        blocknum = 0
+                        break
+                        #tfp = open(name, open_mode)
+                else:
+                    print(name,"无 chunk")
+                    break
         '''
         while True:
             
@@ -124,8 +135,8 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     except:
         traceback.print_exc()
     finally:
-        if "response" in locals():
-            response.close()
+        if "r" in locals():
+            r.close()
         if "tfp" in locals():
             tfp.close()
         if os.path.exists(name):
