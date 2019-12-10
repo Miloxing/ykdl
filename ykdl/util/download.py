@@ -53,7 +53,7 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     size = -1
     read = 0
     blocknum = 0
-    open_mode = 'wb'
+    open_mode = 'ab+'
     req = Request(url, headers = fake_headers)
     try:
         '''
