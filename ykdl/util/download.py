@@ -75,8 +75,9 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 response = urlopen(req, None)
                 open_mode = 'ab'
         '''
-        proxy = {'https':get_proxy()}
+        proxy = {'http':get_proxy()}
         while True:
+            url = 'http://'+url.split("://")[-1]
             r = requests.get(url,proxies=proxy,stream=True,timeout=5)
             reporthook(blocknum, bs, size,name)
             tfp = open(name, open_mode)
@@ -99,32 +100,7 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 else:
                     print(name,"无 chunk")
                     break
-        '''
-        while True:
-            
-            try:
-                block = response.read(bs)
-                if not block:
-                    tfp.close()
-                    status[0] = 1
-                    break
-                read += len(block)
-                tfp.write(block)
-                blocknum += 1
-                if blocknum % 100 == 0:
-                    reporthook(blocknum, bs, size,name)
-                if(blocknum >= 131072):
-                    tfp.close()
-                    print('文件大小达到限制，结束')
-                    os.system('mv "{}" /root/b/'.format(name))
-                    namepart = name.split('-',1)
-                    name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
-                    tfp = open(name, open_mode)
-                    
-            except:
-                tfp.close()
-                break
-        '''
+            break
         if os.path.exists(name):
             filesize = os.path.getsize(name)
             if filesize == size:
