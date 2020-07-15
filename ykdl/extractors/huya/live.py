@@ -11,6 +11,7 @@ from ykdl.compact import unescape#新添加
 import json
 import random
 import time,re
+import base64
 
 
 class HuyaLive(VideoExtractor):
