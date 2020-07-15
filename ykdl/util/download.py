@@ -12,6 +12,7 @@ from .html import fake_headers
 import traceback
 import requests
 import time
+import shutil
 
 logger = getLogger("downloader")
 
@@ -75,10 +76,30 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 response = urlopen(req, None)
                 open_mode = 'ab'
         '''
-        proxy = {'http':get_proxy()}
+        
+        url = 'http://'+url.split("://")[-1]
+        hasproxy=0
+        retry = 0
         while True:
-            url = 'http://'+url.split("://")[-1]
-            r = requests.get(url,proxies=proxy,stream=True,timeout=5)
+            while 1:
+                if hasproxy:
+                    proxy = {'http':get_proxy()}
+                else:
+                    proxy = 0
+                try:
+                    r = requests.get(url,proxies=proxy,stream=True,timeout=(5,8))
+                    if r.status_code == 200 or r.status_code == 404:
+                        break
+                    else:
+                        r.close()
+                        raise Exception(r.status_code)
+                except:
+                    hasproxy = 1
+                    if retry < 10:
+                        retry +=1
+                        continue
+                    else:
+                        break
             reporthook(blocknum, bs, size,name)
             tfp = open(name, open_mode)
             for chunk in r.iter_content(chunk_size=bs):
@@ -91,7 +112,8 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                         tfp.close()
                         r.close()
                         print('文件大小达到限制，结束')
-                        os.system('mv "{}" /root/b/'.format(name))
+                        #os.system('mv "{}" /root/b/'.format(name))
+                        shutil.move(name,'/root/b/')
                         namepart = name.split('-',1)
                         name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
                         blocknum = 0
@@ -121,7 +143,8 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
                 print(name,"大小不足1mb，删除")
                 os.remove(name)
             else:
-                os.system('mv "{}" /root/b/'.format(name))
+                #os.system('mv "{}" /root/b/'.format(name))
+                shutil.move(name,'/root/b/')
     #upload(name)
     
 '''    
