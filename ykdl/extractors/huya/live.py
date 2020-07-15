@@ -5,6 +5,8 @@ from ykdl.extractor import VideoExtractor
 from ykdl.videoinfo import VideoInfo
 from ykdl.util.html import get_content, add_header
 from ykdl.util.match import match1, matchall
+from ykdl.compact import unescape#新添加
+
 
 import json
 import random
@@ -19,9 +21,9 @@ class HuyaLive(VideoExtractor):
 
         html  = get_content(self.url)
 
-        json_script = match1(html, '"stream": ({.+?})\s*};')
-        assert json_script, ""
-        data = json.loads(json_script)
+        json_stream = match1(html, '"stream": "([a-zA-Z0-9+=/]+)"')
+        assert json_stream, "live video is offline"
+        data = json.loads(base64.b64decode(json_stream).decode())
         assert data['status'] == 200, data['msg']
 
         room_info = data['data'][0]['gameLiveInfo']
@@ -32,16 +34,23 @@ class HuyaLive(VideoExtractor):
         info.artist = re.sub(rstr,"_",nick)
 
         stream_info = random.choice(data['data'][0]['gameStreamInfoList'])
-        sFlvUrl = stream_info['sFlvUrl']
         sStreamName = stream_info['sStreamName']
-        sFlvUrlSuffix = stream_info['sFlvUrlSuffix']
-        sFlvAntiCode = stream_info['sFlvAntiCode']
-        Codes = sFlvAntiCode.split("amp;")
-        sFlvAntiCode = "".join(Codes)
-        flv_url = '{}/{}.{}?{}'.format(sFlvUrl, sStreamName, sFlvUrlSuffix, sFlvAntiCode)
+        
+        def link_urls():
+            for sType in ('flv', 'hls'):
+                sType = sType.title()
+                sUrl = stream_info['s{}Url'.format(sType)]
+                sUrlSuffix = stream_info['s{}UrlSuffix'.format(sType)]
+                sAntiCode = stream_info['s{}AntiCode'.format(sType)]
+                yield u'{}/{}.{}?{}'.format(sUrl, sStreamName, sUrlSuffix, sAntiCode)
 
         info.stream_types.append("current")
-        info.streams["current"] = {'container': 'mp4', 'video_profile': "current", 'src': [flv_url], 'size' : float('inf')}
+        info.streams["current"] = {
+            'container': 'flv',
+            'video_profile': 'current',
+            'src': [unescape(url) for url in link_urls()],
+            'size' : float('inf')
+        }
         return info
-
+    
 site = HuyaLive()
