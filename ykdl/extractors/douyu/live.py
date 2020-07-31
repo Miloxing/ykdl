@@ -58,7 +58,7 @@ class Douyutv(VideoExtractor):
                 artist = room_data['owner_name']
         
         
-        rstr = r"[\/\\\:\*\?\"\<\>\|\-\` ]"
+        rstr = r"[\/\\\:\*\?\"\<\>\|\-\`\'\ ]"
         info.title = re.sub(rstr,"_",title)
         info.artist = re.sub(rstr,"_",artist)
         info.live = False
