@@ -24,9 +24,10 @@ def get_random_name(l):
 class Douyutv(VideoExtractor):
     name = u'斗鱼直播 (DouyuTV)'
 
-    stream_ids = ['BD10M', 'BD8M', 'BD4M', 'BD', 'TD', 'HD', 'SD']
+    stream_ids = ['OG','BD10M', 'BD8M', 'BD4M', 'BD', 'TD', 'HD', 'SD']
     profile_2_id = {
         u'蓝光10M': 'BD10M',
+        u'原画': 'OG',
         u'蓝光8M': 'BD8M',
         u'蓝光4M': 'BD4M',
         u'蓝光': 'BD',
