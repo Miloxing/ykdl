@@ -13,6 +13,7 @@ import traceback
 import requests
 import time
 import shutil
+import streamlink
 
 logger = getLogger("downloader")
 
@@ -43,6 +44,61 @@ def simple_hook(arg1, arg2, arg3,name):
         sys.stdout.write('\r'+"\033[K" +name+' -- '+ str(round(arg1 * arg2 / 1048576, 1)) + 'MB')
         sys.stdout.flush()
 
+def streamlink_url(url,name,ext,status,reporthook = simple_hook):
+    try:
+        print("Download: " + name)
+        name = name + '.' + ext
+        streams = streamlink.streams(url)
+        try:
+            stream = ''
+            stream = streams['best']
+        except:
+            print(streams)
+        assert stream
+        fd = stream.open()
+        readbuffer = 1024*8
+        desize = 1024*1024/8
+        size = -1
+        fs=0
+        f = open(name, open_mode)
+        while 1:
+            try:
+                data = fd.read(readbuffer)
+                if data:
+                    f.write(data)
+                else:
+                    break
+                fs+=1
+                if fs % 100 == 0:
+                    reporthook(fs, readbuffer, size,name)
+                if fs>=desize:
+                    f.close()
+                    fs = 0
+                    sys.stdout.write('\033[K')
+                    print(name,'大小达到限制，分割文件')
+                    shutil.move(name,'/root/b/')
+                    namepart = name.split('-',1)
+                    name = time.strftime('%y%m%d_%H%M%S')+"-"+namepart[-1]
+                    fs=0
+                    f = open(name, open_mode)
+            except:
+                break
+        if os.path.exists(name):
+            filesize = os.path.getsize(name)
+            if filesize >0 :
+                status[0] = 1
+    except AssertionError:
+        print(name,'no stream')
+    except:
+        traceback.print_exc()
+    finally:
+        if 'fd' in locals():
+            fd.close()
+        if 'f' in locals():
+            f.close()
+        if os.path.exists(name):
+            shutil.move(name,'/root/b/')
+    
 def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     if part is None:
         print("Download: " + name)
@@ -57,26 +113,6 @@ def save_url(url, name, ext, status, part = None, reporthook = simple_hook):
     open_mode = 'ab+'
     req = Request(url, headers = fake_headers)
     try:
-        '''
-        response = urlopen(req, None)
-        if "content-length" in response.headers:
-            size = int(response.headers["Content-Length"])
-        if os.path.exists(name):
-            filesize = os.path.getsize(name)
-            if filesize == size:
-                print('Skipped: file already downloaded')
-                if part is None:
-                    status[0] = 1
-                else:
-                    status[part] =1
-                return
-            elif -1 != size:
-                req.add_header('Range', 'bytes=%d-' % filesize)
-                blocknum = int(filesize / bs)
-                response = urlopen(req, None)
-                open_mode = 'ab'
-        '''
-        
         url = 'http://'+url.split("://")[-1]
         hasproxy=0
         retry = 0
@@ -159,6 +195,8 @@ def save_urls(urls, name, ext, jobs=1):
     ext = encode_for_wrap(ext)
     status = [0] * len(urls)
     if len(urls) == 1:
+        if ext == "mp4":
+            streamlink_url(urls[0],name,ext,status)
         save_url(urls[0], name, ext, status)
         if 0 in status:
             logger.error("donwload failed")
