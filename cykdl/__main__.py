@@ -68,8 +68,8 @@ def download(urls, name, ext, live = False):
     # rebuild urls when use internal downloader
     if ext == 'm3u8':
         ext = 'mp4'
-        if m3u8_internal:
-            urls = load_m3u8(urls[0])
+        #if m3u8_internal:
+        #    urls = load_m3u8(urls[0])
 
     # OK check m3u8_internal
     if not m3u8_internal:
