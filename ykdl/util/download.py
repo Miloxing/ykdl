@@ -47,6 +47,8 @@ def simple_hook(arg1, arg2, arg3,name):
 def streamlink_url(url,name,ext,status,reporthook = simple_hook):
     try:
         print("Download: " + name)
+        if ext == 'mp4':
+            ext = 'flv'
         name = name + '.' + ext
         streams = streamlink.streams(url)
         try:
