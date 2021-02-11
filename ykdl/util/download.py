@@ -56,6 +56,7 @@ def streamlink_url(url,name,ext,status,reporthook = simple_hook):
             print(streams)
         assert stream
         fd = stream.open()
+        open_mode = 'ab+'
         readbuffer = 1024*8
         desize = 1024*1024/8
         size = -1
