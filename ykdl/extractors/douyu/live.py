@@ -158,7 +158,10 @@ class Douyutv(VideoExtractor):
             real_url = '{}/{}'.format(live_data['rtmp_url'], live_data['rtmp_live'])
             rate_2_profile = dict((rate['rate'], rate['name']) for rate in live_data['multirates'])
             video_profile = rate_2_profile[live_data['rate']]
-            stream = self.profile_2_id[video_profile]
+            if '原画' in video_profile:
+                stream = 'OG'
+            else:
+                stream = self.profile_2_id[video_profile]
             if stream in info.streams:
                 return
             info.stream_types.append(stream)
