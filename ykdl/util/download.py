@@ -22,6 +22,7 @@ def get_proxy():
         try:
             return requests.get("http://127.0.0.1:5010/get/").json().get("proxy")
         except:
+            return ''
             time.sleep(0.5)
 
 try:

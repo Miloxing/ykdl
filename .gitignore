@@ -27,3 +27,4 @@ README.html
 *.DS_Store
 *.swp
 *~
+.idea
