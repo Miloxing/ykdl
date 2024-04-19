@@ -20,7 +20,7 @@ logger = getLogger("downloader")
 def get_proxy():
     while True:
         try:
-            return requests.get("http://127.0.0.1:5010/get/").json().get("proxy")
+            return requests.get("http://158.178.230.57:5010/get/").json().get("proxy")
         except:
             return ''
             time.sleep(0.5)
